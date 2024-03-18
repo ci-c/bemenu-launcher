@@ -156,7 +156,15 @@ if __name__ == '__main__':
         connfig_path.mkdir()
     db = DB(connfig_path / "jornal.db")
     # menu
-    selected = menu.run("Run: ",list(desktops.keys()) + binfiles + ["kitty -e echo 'Hah!'"])
+    menu_list = list(desktops.keys()) + binfiles
+    db_count_table = db.get_count_table()
+    if db_count_table is not None:
+        db_names = list(db_count_table.keys()).sort(key=lambda key: db_count_table[key])
+        for i in menu_list:
+            if i in db_names:
+                menu_list.remove(i)
+        menu_list = db_names + menu_list
+    selected = menu.run("Run: ",menu_list)
     # run
     selected = selected[:-1]
     if selected in desktops.keys():
