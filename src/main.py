@@ -11,16 +11,18 @@ class Menu():
     def __init__(self,cmd:str="bemenu", args:list[str]=[]):
         self._cmd:str = cmd
         self._args:list[str] = args
-    def run(self, prompt:str, items:list[str]=[],new_args:list[str]=[]) -> str:
+    def run(self, prompt:str, items:list[str]=[],new_args:list[str]=[]) -> str | None:
         out = subprocess.run(
             [self._cmd] + self._args + new_args + ["-p", prompt],
             input="\n".join(items).encode("utf-8"),
             stdout=subprocess.PIPE
         )
-        if out.returncode != 0 or out.stderr is not None:
+        if not (out.returncode == 0 or out.returncode == 1) or out.stderr is not None:
             print(f"code: {out.returncode}\nerr: {out.stderr}")
         if out.stdout.decode("utf-8") is not None:
             return out.stdout.decode("utf-8")
+        if out.returncode == 1:
+            return None
 
 class DB:
     def __init__(self, path:pathlib.Path | str):
