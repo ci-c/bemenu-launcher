@@ -43,8 +43,8 @@ class DB:
     def registre(self, name:str):
         conn = sqlite3.connect(self._db_path)
         cur = conn.cursor()
-        date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cur.execute("INSERT INTO jornal (datetime, name) VALUES (?, ?)", (name, date_time))
+        date_time = datetime.datetime.now().isoformat()
+        cur.execute("INSERT INTO jornal (datetime, name) VALUES (?, ?)", (date_time, name))
         conn.commit()
         conn.close()
 
@@ -63,12 +63,7 @@ class DB:
                 table[row[1]] = 1
             else:
                 table[row[1]] += 1
-
-
-
-
-    #print(f"ID: {note[0]}, Запись: {note[1]}, Дата: {note[2]}")
-
+        return table
 
 if __name__ == '__main__':
     menu = Menu(
@@ -161,7 +156,8 @@ if __name__ == '__main__':
     menu_list = list(desktops.keys()) + binfiles
     db_count_table = db.get_count_table()
     if db_count_table is not None:
-        db_names = list(db_count_table.keys()).sort(key=lambda key: db_count_table[key])
+        db_names = list(db_count_table.keys())
+        db_names.sort(key=lambda k: db_count_table[k])
         for i in menu_list:
             if i in db_names:
                 menu_list.remove(i)
