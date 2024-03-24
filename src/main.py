@@ -56,13 +56,16 @@ class DB:
         conn.close()
         return rows
     
-    def get_count_table(self):
+    def get_rating_table(self):
+        a = 0.5
         table = {}
         for row in self._get_all():
-            if row[1] not in table:
-                table[row[1]] = 1
+            dt = datetime.datetime.fromisoformat(row[0]).timestamp()
+            name = row[1]
+            if name not in table:
+                table[name] = 1
             else:
-                table[row[1]] += 1
+                table[name] = (a * dt) + ((1 - a) * table[name])
         return table
 
 if __name__ == '__main__':
@@ -154,13 +157,12 @@ if __name__ == '__main__':
     db = DB(connfig_path / "jornal.db")
     # menu
     menu_list = list(desktops.keys()) + binfiles
-    db_count_table = db.get_count_table()
-    if db_count_table is not None:
-        db_names = list(db_count_table.keys())
-        db_names.sort(key=lambda k: db_count_table[k])
-        for i in menu_list:
-            if i in db_names:
-                menu_list.remove(i)
+    db_rating_table = db.get_rating_table()
+    if db_rating_table is not None:
+        db_names = list(db_rating_table.keys())
+        db_names.sort(key=lambda k: db_rating_table[k])
+        for db_name in db_names:
+            menu_list.remove(db_name)
         menu_list = db_names + menu_list
     selected = menu.run("Run: ",menu_list)
     # run
