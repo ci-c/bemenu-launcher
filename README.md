@@ -9,4 +9,5 @@ bemenu-launcher is simply launcher based on bemenu.
 ### swaywm and etc.
 
 1. Clone repo.
+2. Install `dex`
 2. bind main.py to menu shortcut.
