@@ -58,7 +58,7 @@ class DB:
         return rows
     
     def get_rating_table(self):
-        a = 0.5
+        a = 0.8
         table = {}
         for row in self._get_all():
             dt = datetime.datetime.fromisoformat(row[0]).timestamp()
@@ -159,7 +159,8 @@ if __name__ == '__main__':
         db_names = list(db_rating_table.keys())
         db_names.sort(key=lambda k: db_rating_table[k])
         for db_name in db_names:
-            menu_list.remove(db_name)
+            if db_name in menu_list:
+                menu_list.remove(db_name)
         menu_list = db_names + menu_list
     selected = menu.run("Run: ",menu_list)
     # run
@@ -168,12 +169,12 @@ if __name__ == '__main__':
         subprocess.run(["dex" , desktops[selected]]) 
         db.registre(selected)
     elif selected in binfiles:
-        subprocess.run(["kitty", "--hold", "-e", selected])
+        subprocess.run(["kitty", "-e", selected]) # , "--hold"
         db.registre(selected)
     elif selected == "":
         print("Nothing selected")
     else:
-        print(f"Unknown app:'{selected}'")
+        print(f"Unknown input: '{selected}' - run in shell")
         subprocess.run(selected, shell=True, capture_output=True, text=True)
 
 
