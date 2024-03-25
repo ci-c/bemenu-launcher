@@ -6,6 +6,7 @@ import pathlib
 from xdg.DesktopEntry import DesktopEntry
 import sqlite3
 import datetime
+import logging
 
 class Menu():
     def __init__(self,cmd:str="bemenu", args:list[str]=[]):
@@ -142,15 +143,11 @@ if __name__ == '__main__':
     for path in fdPaths:
         path = pathlib.Path(path)
         if path.is_dir():
-            for item in path.iterdir():
-                if item.is_file() and item.suffix == ".desktop":
-                    entry = DesktopEntry(item)
+            for pathItem in path.iterdir():
+                if pathItem.is_file() and pathItem.suffix == ".desktop":
+                    entry = DesktopEntry(pathItem)
                     if not entry.getExec() is None:
-                        desktops[entry.getName()] = {
-                            "cmd":entry.getExec(),
-                            "cwd":entry.getPath(),
-                            "term":entry.getTerminal(),
-                            }
+                        desktops[entry.getName()] = pathItem
     connfig_path = pathlib.Path.home() / ".config" / "bemenu-launcher"
     if not connfig_path.is_dir():
         connfig_path.mkdir()
@@ -168,16 +165,15 @@ if __name__ == '__main__':
     # run
     selected = selected[:-1]
     if selected in desktops.keys():
-        if desktops[selected]["cwd"] == None or desktops[selected]["cwd"] == '':
-            subprocess.run(desktops[selected]["cmd"], shell=True, capture_output=True, text=True) 
-        else:
-            subprocess.run(desktops[selected]["cmd"],cwd=desktops[selected]["cwd"], shell=True, capture_output=True, text=True)
+        subprocess.run(["dex" , desktops[selected]]) 
         db.registre(selected)
     elif selected in binfiles:
-        subprocess.run(["kitty", "-e", selected])
+        subprocess.run(["kitty", "--hold", "-e", selected])
         db.registre(selected)
+    elif selected == "":
+        print("Nothing selected")
     else:
-        print("Unknown app")
+        print(f"Unknown app:'{selected}'")
         subprocess.run(selected, shell=True, capture_output=True, text=True)
 
 
